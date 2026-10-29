@@ -15,7 +15,7 @@ use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-new #[Title('IT Helpdesk - Tickets')] class extends Component {
+new #[Title('Tickets')] class extends Component {
     use WithPagination;
 
     #[Url]
@@ -298,7 +298,7 @@ new #[Title('IT Helpdesk - Tickets')] class extends Component {
     </flux:card>
 
     <!-- Tickets Table Card -->
-    <flux:card class="p-4 sm:p-6">
+    <flux:card class="p-4 sm:p-6" wire:poll.30s>
         @if ($this->tickets->isEmpty())
             <div class="flex flex-col items-center justify-center py-12 px-6 text-center">
                 <div

@@ -12,7 +12,7 @@
 
             <flux:sidebar.nav>
                 <flux:sidebar.group :heading="__('Helpdesk')" class="grid">
-                    <flux:sidebar.item icon="ticket" :href="route('tickets.index')" :current="request()->routeIs('tickets.index') || request()->routeIs('dashboard')" wire:navigate>
+                    <flux:sidebar.item icon="ticket" :href="route('tickets.index')" :current="request()->routeIs('tickets.index') || request()->routeIs('tickets.show') || request()->routeIs('dashboard')" wire:navigate>
                         {{ __('Tickets') }}
                     </flux:sidebar.item>
                     <flux:sidebar.item icon="plus-circle" :href="route('tickets.create')" :current="request()->routeIs('tickets.create')" wire:navigate>

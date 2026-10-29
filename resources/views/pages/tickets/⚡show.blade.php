@@ -348,7 +348,7 @@ new #[Title('Ticket Details')] class extends Component {
                 </flux:text>
             </flux:card>
         @else
-            <div class="flex flex-col gap-4">
+            <div class="flex flex-col gap-4" wire:poll.30s>
                 @foreach ($this->timeline as $msg)
                     @if ($msg->is_internal)
                         <!-- Internal IT Note (visible only to IT) -->
@@ -372,7 +372,7 @@ new #[Title('Ticket Details')] class extends Component {
                                     @foreach ($msg->attachments as $mAtt)
                                         <a href="{{ $mAtt->url() }}" target="_blank" class="flex items-center gap-2 rounded bg-amber-100/60 px-2.5 py-1 text-xs text-amber-900 dark:bg-amber-900/40 dark:text-amber-200 hover:underline">
                                             <flux:icon name="paper-clip" class="size-3.5" />
-                                            <span class="truncate max-w-[150px]">{{ $mAtt->filename }}</span>
+                                            <span class="truncate max-w-37.5">{{ $mAtt->filename }}</span>
                                         </a>
                                     @endforeach
                                 </div>
@@ -400,7 +400,7 @@ new #[Title('Ticket Details')] class extends Component {
                                             @foreach ($msg->attachments as $mAtt)
                                                 <a href="{{ $mAtt->url() }}" target="_blank" class="flex items-center gap-2 rounded bg-zinc-100 px-2.5 py-1 text-xs text-zinc-800 dark:bg-zinc-700 dark:text-zinc-200 hover:underline">
                                                     <flux:icon name="paper-clip" class="size-3.5" />
-                                                    <span class="truncate max-w-[150px]">{{ $mAtt->filename }}</span>
+                                                    <span class="truncate max-w-37.5">{{ $mAtt->filename }}</span>
                                                 </a>
                                             @endforeach
                                         </div>
@@ -462,7 +462,7 @@ new #[Title('Ticket Details')] class extends Component {
                             type="file"
                             wire:model="replyAttachments"
                             multiple
-                            class="text-xs text-zinc-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-zinc-100 file:text-zinc-700 hover:file:bg-zinc-200 dark:file:bg-zinc-700 dark:file:text-zinc-200"
+                            class="text-xs text-zinc-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-zinc-100 file:text-zinc-700 hover:file:bg-zinc-800 dark:file:bg-zinc-700 dark:file:text-zinc-200"
                         />
                         <div wire:loading wire:target="replyAttachments" class="text-xs text-sky-600 dark:text-sky-400 mt-1">
                             {{ __('Uploading file...') }}
@@ -472,7 +472,7 @@ new #[Title('Ticket Details')] class extends Component {
                             <div class="flex flex-wrap gap-2 mt-2">
                                 @foreach ($replyAttachments as $index => $file)
                                     <div class="flex items-center gap-1.5 rounded border border-zinc-200 bg-zinc-50 px-2 py-1 text-xs dark:border-zinc-700 dark:bg-zinc-800">
-                                        <span class="truncate max-w-[120px]">{{ $file->getClientOriginalName() }}</span>
+                                        <span class="truncate max-w-30">{{ $file->getClientOriginalName() }}</span>
                                         <button type="button" wire:click="removeReplyAttachment({{ $index }})" class="text-red-500">
                                             <flux:icon name="x-mark" class="size-3.5" />
                                         </button>
@@ -490,4 +490,3 @@ new #[Title('Ticket Details')] class extends Component {
         </flux:card>
     @endif
 </div>
-
