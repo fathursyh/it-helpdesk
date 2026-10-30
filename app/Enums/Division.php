@@ -9,7 +9,7 @@ enum Division: string
     case Operations = 'operations';
     case Bd = 'bd';
     case Executive = 'executive';
-    case Field = 'field';
+    case Comms = 'comms';
     case It = 'it';
     case Other = 'other';
 
@@ -21,7 +21,7 @@ enum Division: string
             self::Operations => 'Operations',
             self::Bd => 'BD',
             self::Executive => 'Executive',
-            self::Field => 'Field',
+            self::Comms => 'Comms',
             self::It => 'IT',
             self::Other => 'Other',
         };
