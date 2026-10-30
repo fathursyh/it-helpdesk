@@ -23,7 +23,10 @@
 
             @if (auth()->user()->isIT())
                 <flux:sidebar.nav>
-                    <flux:sidebar.group :heading="__('Administration')" class="grid">
+                    <flux:sidebar.group :heading="__('IT Team')" class="grid">
+                        <flux:sidebar.item icon="chart-bar" :href="route('analytics.index')" :current="request()->routeIs('analytics.*')" wire:navigate>
+                            {{ __('Analytics') }}
+                        </flux:sidebar.item>
                         <flux:sidebar.item icon="users" :href="route('it-accounts.index')" :current="request()->routeIs('it-accounts.*')" wire:navigate>
                             {{ __('IT Accounts') }}
                         </flux:sidebar.item>
@@ -76,6 +79,9 @@
                             {{ __('Submit Issue') }}
                         </flux:menu.item>
                         @if (auth()->user()->isIT())
+                            <flux:menu.item :href="route('analytics.index')" icon="chart-bar" wire:navigate>
+                                {{ __('Analytics') }}
+                            </flux:menu.item>
                             <flux:menu.item :href="route('it-accounts.index')" icon="users" wire:navigate>
                                 {{ __('IT Accounts') }}
                             </flux:menu.item>

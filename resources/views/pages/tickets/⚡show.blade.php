@@ -110,6 +110,10 @@ new #[Title('Ticket Details')] class extends Component {
         } elseif ($newStatus === TicketStatus::Closed) {
             $updates['closed_at'] = now();
         } elseif ($newStatus === TicketStatus::Open) {
+            if (in_array($oldStatus, [TicketStatus::Resolved, TicketStatus::Closed], true)) {
+                $updates['reopened_at'] = now();
+                $updates['reopened_count'] = ($this->ticket->reopened_count ?? 0) + 1;
+            }
             $updates['resolved_at'] = null;
             $updates['closed_at'] = null;
         }
@@ -177,6 +181,11 @@ new #[Title('Ticket Details')] class extends Component {
             ]);
         }
 
+        // Track first response time by IT staff
+        if ($user->isIT() && $this->ticket->first_responded_at === null) {
+            $this->ticket->update(['first_responded_at' => now()]);
+        }
+
         // Send notifications for public updates
         if (! $isInternal) {
             if ($user->isIT()) {
@@ -209,7 +218,7 @@ new #[Title('Ticket Details')] class extends Component {
     }
 }; ?>
 
-<div class="mx-auto max-w-5xl w-full flex flex-col gap-6">
+<div class="mx-auto max-w-5xl w-full flex flex-col gap-6" wire:poll.30s>
     <!-- Breadcrumbs -->
     <div class="flex items-center justify-between">
         <flux:breadcrumbs>
@@ -348,7 +357,7 @@ new #[Title('Ticket Details')] class extends Component {
                 </flux:text>
             </flux:card>
         @else
-            <div class="flex flex-col gap-4" wire:poll.30s>
+            <div class="flex flex-col gap-4">
                 @foreach ($this->timeline as $msg)
                     @if ($msg->is_internal)
                         <!-- Internal IT Note (visible only to IT) -->

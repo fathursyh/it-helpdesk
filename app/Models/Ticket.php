@@ -27,7 +27,10 @@ use Illuminate\Support\Carbon;
  * @property string $title
  * @property string $description
  * @property Carbon|null $resolved_at
+ * @property Carbon|null $first_responded_at
  * @property Carbon|null $closed_at
+ * @property Carbon|null $reopened_at
+ * @property int $reopened_count
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
@@ -42,7 +45,10 @@ use Illuminate\Support\Carbon;
     'title',
     'description',
     'resolved_at',
+    'first_responded_at',
     'closed_at',
+    'reopened_at',
+    'reopened_count',
 ])]
 class Ticket extends Model
 {
@@ -72,7 +78,10 @@ class Ticket extends Model
             'priority' => TicketPriority::class,
             'status' => TicketStatus::class,
             'resolved_at' => 'datetime',
+            'first_responded_at' => 'datetime',
             'closed_at' => 'datetime',
+            'reopened_at' => 'datetime',
+            'reopened_count' => 'integer',
         ];
     }
 
