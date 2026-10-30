@@ -70,8 +70,7 @@ new #[Title('IT Staff Accounts')] class extends Component {
             ])
             ->when($this->search !== '', function (Builder $query): void {
                 $query->where(function (Builder $sub): void {
-                    $sub->where('name', 'like', "%{$this->search}%")
-                        ->orWhere('email', 'like', "%{$this->search}%");
+                    $sub->where('name', 'like', "%{$this->search}%")->orWhere('email', 'like', "%{$this->search}%");
                 });
             })
             ->orderBy('name')
@@ -86,9 +85,7 @@ new #[Title('IT Staff Accounts')] class extends Component {
     #[Computed]
     public function availableEmployees(): Collection
     {
-        return User::where('role', UserRole::Employee)
-            ->orderBy('name')
-            ->get();
+        return User::where('role', UserRole::Employee)->orderBy('name')->get();
     }
 
     /**
@@ -115,15 +112,18 @@ new #[Title('IT Staff Accounts')] class extends Component {
     {
         abort_unless(Auth::user()?->isIT(), 403);
 
-        $this->validate([
-            'newName' => ['required', 'string', 'max:255'],
-            'newEmail' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-            'newPassword' => ['required', 'string', 'min:8', 'same:newPassword_confirmation'],
-            'newDivision' => ['required', Rule::enum(Division::class)],
-        ], [
-            'newEmail.unique' => __('This email address is already registered.'),
-            'newPassword.same' => __('Password confirmation does not match.'),
-        ]);
+        $this->validate(
+            [
+                'newName' => ['required', 'string', 'max:255'],
+                'newEmail' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+                'newPassword' => ['required', 'string', 'min:8', 'same:newPassword_confirmation'],
+                'newDivision' => ['required', Rule::enum(Division::class)],
+            ],
+            [
+                'newEmail.unique' => __('This email address is already registered.'),
+                'newPassword.same' => __('Password confirmation does not match.'),
+            ],
+        );
 
         User::create([
             'name' => $this->newName,
@@ -178,7 +178,7 @@ new #[Title('IT Staff Accounts')] class extends Component {
         $user->email = $this->editEmail;
         $user->division = Division::from($this->editDivision);
 
-        if (! empty($this->editPassword)) {
+        if (!empty($this->editPassword)) {
             $user->password = Hash::make($this->editPassword);
         }
 
@@ -252,15 +252,15 @@ new #[Title('IT Staff Accounts')] class extends Component {
 
 <div class="flex flex-col gap-6 w-full">
     <!-- Header -->
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
+    <div class="flex w-full flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div class="min-w-0">
             <flux:heading size="xl">{{ __('IT Staff Accounts') }}</flux:heading>
             <flux:subheading>
                 {{ __('Manage accounts authorized to triage tickets, assign issues, and communicate internally.') }}
             </flux:subheading>
         </div>
 
-        <div class="flex flex-wrap items-center gap-3">
+        <div class="flex shrink-0 flex-wrap items-center gap-3 sm:justify-end">
             @if ($this->availableEmployees->isNotEmpty())
                 <flux:button wire:click="$set('showPromoteModal', true)" variant="subtle" icon="arrow-up-circle">
                     {{ __('Promote Employee') }}
@@ -276,7 +276,8 @@ new #[Title('IT Staff Accounts')] class extends Component {
     <!-- Stats Overview -->
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <flux:card class="flex items-center gap-4 p-5">
-            <div class="flex size-11 items-center justify-center rounded-lg bg-sky-50 text-sky-600 dark:bg-sky-950/50 dark:text-sky-400">
+            <div
+                class="flex size-11 items-center justify-center rounded-lg bg-sky-50 text-sky-600 dark:bg-sky-950/50 dark:text-sky-400">
                 <flux:icon name="users" class="size-6" />
             </div>
             <div>
@@ -286,17 +287,20 @@ new #[Title('IT Staff Accounts')] class extends Component {
         </flux:card>
 
         <flux:card class="flex items-center gap-4 p-5">
-            <div class="flex size-11 items-center justify-center rounded-lg bg-amber-50 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400">
+            <div
+                class="flex size-11 items-center justify-center rounded-lg bg-amber-50 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400">
                 <flux:icon name="ticket" class="size-6" />
             </div>
             <div>
                 <flux:text size="sm">{{ __('Active Assigned Tickets') }}</flux:text>
-                <flux:heading size="lg" class="tabular-nums">{{ $this->stats['active_assigned_tickets'] }}</flux:heading>
+                <flux:heading size="lg" class="tabular-nums">{{ $this->stats['active_assigned_tickets'] }}
+                </flux:heading>
             </div>
         </flux:card>
 
         <flux:card class="flex items-center gap-4 p-5">
-            <div class="flex size-11 items-center justify-center rounded-lg bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
+            <div
+                class="flex size-11 items-center justify-center rounded-lg bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
                 <flux:icon name="user-group" class="size-6" />
             </div>
             <div>
@@ -309,12 +313,8 @@ new #[Title('IT Staff Accounts')] class extends Component {
     <!-- Filter / Search -->
     <flux:card class="p-4 sm:p-5">
         <div class="max-w-md">
-            <flux:input
-                wire:model.live.debounce.300ms="search"
-                placeholder="{{ __('Search IT staff by name or email...') }}"
-                icon="magnifying-glass"
-                clearable
-            />
+            <flux:input wire:model.live.debounce.300ms="search"
+                placeholder="{{ __('Search IT staff by name or email...') }}" icon="magnifying-glass" clearable />
         </div>
     </flux:card>
 
@@ -322,7 +322,8 @@ new #[Title('IT Staff Accounts')] class extends Component {
     <flux:card>
         @if ($this->itStaffMembers->isEmpty())
             <div class="flex flex-col items-center justify-center py-16 px-6 text-center">
-                <div class="flex size-14 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 mb-3">
+                <div
+                    class="flex size-14 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 mb-3">
                     <flux:icon name="users" class="size-8" />
                 </div>
                 <flux:heading size="lg">{{ __('No IT staff found') }}</flux:heading>
@@ -343,15 +344,19 @@ new #[Title('IT Staff Accounts')] class extends Component {
 
                 <flux:table.rows>
                     @foreach ($this->itStaffMembers as $member)
-                        <flux:table.row :key="$member->id" class="group hover:bg-zinc-50/80 dark:hover:bg-zinc-800/40 transition-colors">
+                        <flux:table.row :key="$member->id"
+                            class="group hover:bg-zinc-50/80 dark:hover:bg-zinc-800/40 transition-colors">
                             <flux:table.cell class="py-4">
                                 <div class="flex items-center gap-3">
-                                    <flux:avatar size="sm" :name="$member->name" :initials="$member->initials()" />
+                                    <flux:avatar size="sm" :name="$member->name"
+                                        :initials="$member->initials()" />
                                     <div class="flex flex-col">
                                         <div class="flex items-center gap-2">
-                                            <span class="font-medium text-sm text-zinc-900 dark:text-zinc-100">{{ $member->name }}</span>
+                                            <span
+                                                class="font-medium text-sm text-zinc-900 dark:text-zinc-100">{{ $member->name }}</span>
                                             @if ($member->id === auth()->id())
-                                                <flux:badge size="xs" color="sky">{{ __('You') }}</flux:badge>
+                                                <flux:badge size="xs" color="sky">{{ __('You') }}
+                                                </flux:badge>
                                             @endif
                                         </div>
                                     </div>
@@ -359,7 +364,8 @@ new #[Title('IT Staff Accounts')] class extends Component {
                             </flux:table.cell>
 
                             <flux:table.cell class="py-4">
-                                <span class="text-sm text-zinc-600 dark:text-zinc-300 font-mono">{{ $member->email }}</span>
+                                <span
+                                    class="text-sm text-zinc-600 dark:text-zinc-300 font-mono">{{ $member->email }}</span>
                             </flux:table.cell>
 
                             <flux:table.cell class="py-4">
@@ -379,29 +385,29 @@ new #[Title('IT Staff Accounts')] class extends Component {
                                             0 {{ __('Active') }}
                                         </flux:badge>
                                     @endif
-                                    <span class="text-xs text-zinc-400">({{ $member->assigned_tickets_count }} {{ __('total') }})</span>
+                                    <span class="text-xs text-zinc-400">({{ $member->assigned_tickets_count }}
+                                        {{ __('total') }})</span>
                                 </div>
                             </flux:table.cell>
 
                             <flux:table.cell class="py-4 whitespace-nowrap">
-                                <flux:text size="xs" class="text-zinc-500">{{ $member->created_at->format('M d, Y') }}</flux:text>
+                                <flux:text size="xs" class="text-zinc-500">
+                                    {{ $member->created_at->format('M d, Y') }}</flux:text>
                             </flux:table.cell>
 
                             <flux:table.cell class="py-4 text-end">
                                 <div class="flex items-center justify-end gap-1.5">
-                                    <flux:button wire:click="openEditModal({{ $member->id }})" variant="ghost" size="sm" icon="pencil-square" aria-label="{{ __('Edit IT member') }}">
+                                    <flux:button wire:click="openEditModal({{ $member->id }})" variant="ghost"
+                                        size="sm" icon="pencil-square" aria-label="{{ __('Edit IT member') }}">
                                         {{ __('Edit') }}
                                     </flux:button>
 
                                     @if ($member->id !== auth()->id() && $this->itStaffMembers->total() > 1)
-                                        <flux:button
-                                            wire:click="demoteItStaff({{ $member->id }})"
+                                        <flux:button wire:click="demoteItStaff({{ $member->id }})"
                                             wire:confirm="{{ __('Are you sure you want to demote :name to a regular employee? Any open tickets assigned to them will become unassigned.', ['name' => $member->name]) }}"
-                                            variant="ghost"
-                                            size="sm"
+                                            variant="ghost" size="sm"
                                             class="text-red-600 hover:text-red-700 dark:text-red-400"
-                                            icon="arrow-down-circle"
-                                        >
+                                            icon="arrow-down-circle">
                                             {{ __('Demote') }}
                                         </flux:button>
                                     @endif
@@ -426,13 +432,15 @@ new #[Title('IT Staff Accounts')] class extends Component {
 
             <flux:field>
                 <flux:label>{{ __('Full Name') }}</flux:label>
-                <flux:input wire:model="newName" type="text" required placeholder="{{ __('e.g., Alex Johnson') }}" />
+                <flux:input wire:model="newName" type="text" required
+                    placeholder="{{ __('e.g., Alex Johnson') }}" />
                 <flux:error name="newName" />
             </flux:field>
 
             <flux:field>
                 <flux:label>{{ __('Email Address') }}</flux:label>
-                <flux:input wire:model="newEmail" type="email" required placeholder="{{ __('it.staff@company.com') }}" />
+                <flux:input wire:model="newEmail" type="email" required
+                    placeholder="{{ __('it.staff@company.com') }}" />
                 <flux:error name="newEmail" />
             </flux:field>
 
@@ -449,13 +457,15 @@ new #[Title('IT Staff Accounts')] class extends Component {
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <flux:field>
                     <flux:label>{{ __('Password') }}</flux:label>
-                    <flux:input wire:model="newPassword" type="password" required viewable placeholder="{{ __('Minimum 8 chars') }}" />
+                    <flux:input wire:model="newPassword" type="password" required viewable
+                        placeholder="{{ __('Minimum 8 chars') }}" />
                     <flux:error name="newPassword" />
                 </flux:field>
 
                 <flux:field>
                     <flux:label>{{ __('Confirm Password') }}</flux:label>
-                    <flux:input wire:model="newPassword_confirmation" type="password" required viewable placeholder="{{ __('Confirm password') }}" />
+                    <flux:input wire:model="newPassword_confirmation" type="password" required viewable
+                        placeholder="{{ __('Confirm password') }}" />
                 </flux:field>
             </div>
 
@@ -504,7 +514,8 @@ new #[Title('IT Staff Accounts')] class extends Component {
 
             <flux:field>
                 <flux:label>{{ __('Reset Password (Leave blank to keep current)') }}</flux:label>
-                <flux:input wire:model="editPassword" type="password" viewable placeholder="{{ __('New password (optional)') }}" />
+                <flux:input wire:model="editPassword" type="password" viewable
+                    placeholder="{{ __('New password (optional)') }}" />
                 <flux:error name="editPassword" />
             </flux:field>
 
